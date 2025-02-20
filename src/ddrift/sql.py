@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from drift.base import BaseComparator
-from drift.results import FreqResults
-from drift._utils import stringify_container
+from ddrift.base import BaseComparator
+from ddrift.results import FreqResults
+from ddrift._utils import stringify_container
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import Any
     from collections.abc import Collection
-    from drift.results import Results
+    from ddrift.results import Results
 
 
 class SQLComparator(BaseComparator):

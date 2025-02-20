@@ -1,4 +1,4 @@
-`drift` analyzes the differences between data sources, i.e. how much has dataset a drifted from dataset b. The framework is engine agnostic. Each  engine is required to comply with simple abstract protocols in order to enable the standard reporting.
+`ddrift` analyzes the differences between data sources, i.e. how much has dataset a drifted from dataset b. The framework is engine agnostic. Each  engine is required to comply with simple abstract protocols in order to enable the standard reporting.
 
 Engines Supported:
 - DuckDB
@@ -8,7 +8,7 @@ Engines to be Supported:
 - Polars
 - Pandas
 
-Install with `pip install drift` or (prefferebly) `uv pip install drift`
+Install with `pip install ddrift` or (prefferebly) `uv pip install ddrift`
 
 ## Getting Started
 
