@@ -1,0 +1,31 @@
+[project]
+name = "drift"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "Tyler Riccio", email = "tylerriccio8@gmail.com" }]
+requires-python = ">=3.11"
+dependencies = ["narwhals>=1.27.1"]
+
+[project.scripts]
+drift = "drift:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "duckdb>=1.2.0",
+    "mypy>=1.15.0",
+    "polars>=1.22.0",
+    "pyarrow>=19.0.1",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "pytest-randomly>=3.16.0",
+    "ruff>=0.9.6",
+]
+
+[tool.mypy]
+strict = true
+disable_error_code = ['import-untyped']
