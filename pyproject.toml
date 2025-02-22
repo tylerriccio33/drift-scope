@@ -1,14 +1,11 @@
 [project]
-name = "datadrift"
+name = "drift-scope"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [{ name = "Tyler Riccio", email = "tylerriccio8@gmail.com" }]
 requires-python = ">=3.11"
 dependencies = ["narwhals>=1.27.1"]
-
-[project.scripts]
-datadrift = "datadrift:main"
 
 [build-system]
 requires = ["hatchling"]

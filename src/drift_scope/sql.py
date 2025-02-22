@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from ddrift.base import BaseComparator
-from ddrift.results import FreqResults
-from ddrift._utils import stringify_container
-from ddrift._sql import CONNECTIONS
+from drift_scope.base import BaseComparator
+from drift_scope.results import FreqResults
+from drift_scope._utils import stringify_container
+from drift_scope._sql import CONNECTIONS
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from ddrift.results import Results
-    from ddrift._sql import _SQLConnectionProtocol
+    from drift_scope.results import Results
+    from drift_scope._sql import _SQLConnectionProtocol
     from typing import Any, Type
 
 

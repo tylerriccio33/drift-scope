@@ -1,6 +1,6 @@
 from __future__ import annotations
 import duckdb
-from ddrift.sql import SQLComparator
+from drift_scope.sql import SQLComparator
 import polars as pl
 from testcontainers.postgres import PostgresContainer
 
