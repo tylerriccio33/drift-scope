@@ -1,5 +1,5 @@
 [project]
-name = "ddrift"
+name = "datadrift"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -8,7 +8,7 @@ requires-python = ">=3.11"
 dependencies = ["narwhals>=1.27.1"]
 
 [project.scripts]
-ddrift = "ddrift:main"
+datadrift = "datadrift:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -24,6 +24,7 @@ dev = [
     "pytest-cov>=6.0.0",
     "pytest-randomly>=3.16.0",
     "ruff>=0.9.6",
+    "testcontainers>=4.9.1",
 ]
 
 [tool.mypy]

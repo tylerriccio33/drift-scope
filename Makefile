@@ -17,3 +17,4 @@ clean:
 	rm -rf .venv
 	rm -rf tests/__pycache__
 	rm -rf src/ddirft/__pycache
+	rm -rf .ruff_cache

@@ -2,8 +2,13 @@ from __future__ import annotations
 import duckdb
 from ddrift.sql import SQLComparator
 import polars as pl
+from testcontainers.postgres import PostgresContainer
 
 
+raise NotImplementedError('Setup test container for postgres')
+multi_con_test_params = [
+    
+]
 def test_manual1() -> None:
     with duckdb.connect() as con:
         con.execute("CREATE TABLE table1 (city VARCHAR, state VARCHAR)")
@@ -97,6 +102,7 @@ def test_manual1() -> None:
             res_pl.filter(pl.col("city") == "Philadelphia").select("pct_diff").item()
             == 1.0
         ), msg
+
 
 if __name__ == "__main__":
     test_manual1()
