@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import pyarrow as pa
 
@@ -72,3 +72,6 @@ class _Psycopg2ConnectionProtocol(_SQLConnectionProtocol):
 class SQLConnections(Enum):
     PSYCOPG2 = _Psycopg2ConnectionProtocol
     DUCKDB = _DuckDBConnectionProtocol
+
+
+SQL_CONNECTIONS = Literal["PSYCOPG2", "DUCKDB"]

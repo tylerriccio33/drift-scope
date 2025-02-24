@@ -11,14 +11,14 @@ if TYPE_CHECKING:
     from collections.abc import Collection
     from typing import Any
 
-    from drift_scope._sql import _SQLConnectionProtocol
+    from drift_scope._sql import SQL_CONNECTIONS, _SQLConnectionProtocol
     from drift_scope.results import Results
 
 
 class SQLComparator(BaseComparator):
     """Compare SQL Tables."""
 
-    def __init__(self, df1: str, df2: str, con: Any, con_type: str) -> None:
+    def __init__(self, df1: str, df2: str, con: Any, con_type: SQL_CONNECTIONS) -> None:
         self.df1 = df1
         self.df2 = df2
         self.con = con
