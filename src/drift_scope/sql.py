@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import random
+import string
 from typing import TYPE_CHECKING
 
 from drift_scope._sql import SQLConnections
@@ -10,6 +12,8 @@ from drift_scope.results import FreqResults
 if TYPE_CHECKING:
     from collections.abc import Collection
     from typing import Any
+
+    from narwhals.typing import IntoFrame
 
     from drift_scope._sql import SQL_CONNECTIONS, _SQLConnectionProtocol
     from drift_scope.results import Results
@@ -40,10 +44,17 @@ class SQLComparator(BaseComparator):
             f"SELECT {groupkey_stmt}, count(*) as n2 FROM {self.df2!s} GROUP BY {groupkey_stmt}"
         )
 
-        self.protocol.create(self.con, statement1, "agg1")
-        self.protocol.create(self.con, statement2, "agg2")
+        agg1_table: str = "".join(random.choices(string.ascii_lowercase, k=8))
+        agg2_table = "".join(random.choices(string.ascii_lowercase, k=8))
 
-        join_query: str = f"SELECT * FROM agg1 FULL JOIN agg2 USING ({groupkey_stmt})"
+        self.protocol.exec(self.con, "BEGIN TRANSACTION")
+
+        self.protocol.create(self.con, statement1, agg1_table)
+        self.protocol.create(self.con, statement2, agg2_table)
+
+        join_query: str = (
+            f"SELECT * FROM {agg1_table} FULL JOIN {agg2_table} USING ({groupkey_stmt})"
+        )
         self.protocol.create(self.con, join_query, "joined")
 
         ## Fill Nulls as 0s:
@@ -67,7 +78,12 @@ class SQLComparator(BaseComparator):
         ) subquery
         """
         cols = list(vars) + list(self.comp_freq_analysis_cols)
-        res = self.protocol.materialize(self.con, diff_query, cols=cols)
+        res: IntoFrame = self.protocol.materialize(self.con, diff_query, cols=cols)
+
+        ## Rollback post-materialization:
+        ## Rolling back isn't necessary for some engines that already
+        ## require an explicit commit in the first place.
+        self.protocol.exec(self.con, "ROLLBACK")
 
         ## Arrange Results:
         self.results.append(
