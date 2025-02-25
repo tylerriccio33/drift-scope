@@ -15,9 +15,14 @@ if TYPE_CHECKING:
 
 
 class _SQLConnectionProtocol(ABC):
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def create(con: Any, query: str, table: str) -> None:
+    def get_tables(cls, con: Any) -> tuple[str, ...]:
+        """Retrieve list of tables in the connection."""
+
+    @classmethod
+    @abstractmethod
+    def create(cls, con: Any, query: str, table: str) -> None:
         """Create a connection. Must be implemented by subclasses."""
 
     @staticmethod
@@ -25,29 +30,41 @@ class _SQLConnectionProtocol(ABC):
     def exec(con: Any, query: str) -> None:
         """Execute a command or operation. Must be implemented by subclasses."""
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def materialize(con: Any, query: str, cols: Collection[str]) -> IntoFrame:
+    def materialize(cls, con: Any, query: str, cols: Collection[str]) -> IntoFrame:
         """Return a query as arrow. Must be implemented by subclasses."""
 
 
 class _DuckDBConnectionProtocol(_SQLConnectionProtocol):
-    @staticmethod
-    def create(con: DuckDBPyConnection, query: str, table: str) -> None:
+    @classmethod
+    def get_tables(cls, con: DuckDBPyConnection) -> tuple[Any, ...]:
+        table_data: pa.Table = cls.materialize(con, "SHOW TABLES", "name")
+        return tuple(table_data["name"].to_pylist())
+
+    @classmethod
+    def create(cls, con: DuckDBPyConnection, query: str, table: str) -> None:
         con.sql(query).create(table)
 
     @staticmethod
     def exec(con: DuckDBPyConnection, query: str) -> None:
         con.sql(query)
 
-    @staticmethod
-    def materialize(con: DuckDBPyConnection, query: str, cols: Collection[str]) -> IntoFrame:
+    @classmethod
+    def materialize(cls, con: DuckDBPyConnection, query: str, cols: Collection[str]) -> pa.Table:
         return con.sql(query).arrow()
 
 
 class _Psycopg2ConnectionProtocol(_SQLConnectionProtocol):
-    @staticmethod
-    def create(con: psycopg2.connect, query: str, table: str) -> None:
+    @classmethod
+    def get_tables(cls, con: psycopg2.connect) -> tuple[Any, ...]:
+        table_data: pa.Table = cls.materialize(
+            con, "SELECT table_name FROM information_schema.tables", ("table_name",)
+        )
+        return tuple(table_data["table_name"].to_pylist())
+
+    @classmethod
+    def create(cls, con: psycopg2.connect, query: str, table: str) -> None:
         # prefix the select query with a create
         create_stmt = f"CREATE TABLE {table} AS " + query
         con.execute(create_stmt)
@@ -56,10 +73,10 @@ class _Psycopg2ConnectionProtocol(_SQLConnectionProtocol):
     def exec(con: psycopg2.connect, query: str) -> None:
         con.execute(query)
 
-    @staticmethod
+    @classmethod
     def materialize(
-        con: psycopg2.extensions.cursor, query: str, cols: Collection[str]
-    ) -> IntoFrame:
+        cls, con: psycopg2.extensions.cursor, query: str, cols: Collection[str]
+    ) -> pa.Table:
         con.execute(query)
         raw: tuple[Any, ...] = con.fetchall()
         data: dict[str, Any] = {col: [] for col in cols}
