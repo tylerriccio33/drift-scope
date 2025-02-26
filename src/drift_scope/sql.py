@@ -22,10 +22,18 @@ if TYPE_CHECKING:
 class SQLComparator(BaseComparator):
     """Compare SQL Tables."""
 
-    def __init__(self, df1: str, df2: str, con: Any, con_type: SQL_CONNECTIONS) -> None:
+    def __init__(
+        self,
+        df1: str,
+        df2: str,
+        con: Any,
+        con_type: SQL_CONNECTIONS,
+        work_schema: str | None = None,
+    ) -> None:
         self.df1 = df1
         self.df2 = df2
         self.con = con
+        self.work_schema = work_schema
         self.results: list[Results] = []
 
         try:
@@ -44,13 +52,16 @@ class SQLComparator(BaseComparator):
             f"SELECT {groupkey_stmt}, count(*) as n2 FROM {self.df2!s} GROUP BY {groupkey_stmt}"
         )
 
-        agg1_table: str = "".join(random.choices(string.ascii_lowercase, k=8))
-        agg2_table = "".join(random.choices(string.ascii_lowercase, k=8))
+        interim_schema_ref = ""
+        if self.work_schema:
+            interim_schema_ref = self.work_schema + "."
+
+        agg1_table: str = interim_schema_ref + "".join(random.choices(string.ascii_lowercase, k=8))
+        agg2_table = interim_schema_ref + "".join(random.choices(string.ascii_lowercase, k=8))
 
         self.protocol.exec(self.con, "BEGIN TRANSACTION")
-
-        self.protocol.create(self.con, statement1, agg1_table)
-        self.protocol.create(self.con, statement2, agg2_table)
+        self.protocol.create(self.con, statement1, f"{agg1_table}")
+        self.protocol.create(self.con, statement2, f"{agg2_table}")
 
         join_query: str = (
             f"SELECT * FROM {agg1_table} FULL JOIN {agg2_table} USING ({groupkey_stmt})"

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import contextlib
-from typing import TYPE_CHECKING, cast
+import itertools
+from typing import TYPE_CHECKING, NamedTuple, cast
 
 import duckdb
 import polars as pl
@@ -15,14 +16,13 @@ from drift_scope.sql import SQLComparator
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator
-    from contextlib import AbstractContextManager
     from typing import Any
 
     from drift_scope._sql import SQL_CONNECTIONS
     from drift_scope.results import Results
 
     type GenReturn = Generator[Any, None, None]
-    type ConYielder = Callable[[None], GenReturn]
+    type ConYielder = Callable[[], GenReturn]
 
 
 @contextlib.contextmanager
@@ -40,18 +40,36 @@ def _get_duckdb() -> GenReturn:
         yield con
 
 
-multi_con_test_params = [("DUCKDB", _get_duckdb), ("PSYCOPG2", _get_postgres)]
+class _Args(NamedTuple):
+    con_type: SQL_CONNECTIONS
+    yielder: Any
+    work_schema: str | None = None
 
 
-@pytest.mark.parametrize(("con_type", "yielder"), multi_con_test_params)
-def test_manual1(con_type: SQL_CONNECTIONS, yielder: AbstractContextManager) -> None:  # type: ignore[type-arg]
+args: tuple[_Args, ...] = (
+    _Args(con_type="DUCKDB", yielder=_get_duckdb),
+    _Args(con_type="PSYCOPG2", yielder=_get_postgres),
+)
+
+schema_opts = (None, "fooschema")
+expanded_args = tuple(
+    _Args(con_type=arg.con_type, yielder=arg.yielder, work_schema=schema)
+    for arg, schema in itertools.product(args, schema_opts)
+)
+
+
+@pytest.mark.parametrize("arg", expanded_args)
+def test_manual1(arg: _Args) -> None:
     """Test categorical comparison case."""
-    with yielder() as con:  # type: ignore[operator]
-        protocol = SQLConnections[con_type].value
+    with arg.yielder() as con:
+        protocol = SQLConnections[arg.con_type].value
 
         tables_at_start: tuple[str, ...] = protocol.get_tables(con)
 
         con.execute("BEGIN TRANSACTION;")
+
+        if arg.work_schema:
+            con.execute(f"CREATE SCHEMA {arg.work_schema}")
 
         con.execute("CREATE TABLE table1 (city VARCHAR, state VARCHAR)")
         con.execute(
@@ -65,7 +83,9 @@ def test_manual1(con_type: SQL_CONNECTIONS, yielder: AbstractContextManager) -> 
 
         con.execute("COMMIT;")  # ensure the tables exist before the comp
 
-        comp = SQLComparator(df1="table1", df2="table2", con=con, con_type=con_type)
+        comp = SQLComparator(
+            df1="table1", df2="table2", con=con, con_type=arg.con_type, work_schema=arg.work_schema
+        )
         comp.comp_freq(vars=("city", "state"))
 
         ## Assert Integrity of Connection:
@@ -122,5 +142,5 @@ def test_manual1(con_type: SQL_CONNECTIONS, yielder: AbstractContextManager) -> 
 
 
 if __name__ == "__main__":
-    for param in multi_con_test_params:
-        test_manual1(*param)
+    for param in expanded_args:
+        test_manual1(param)
