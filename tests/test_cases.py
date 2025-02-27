@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from typing import Any
 
     from drift_scope._sql import SQL_CONNECTIONS
-    from drift_scope.results import Results
 
     type GenReturn = Generator[Any, None, None]
     type ConYielder = Callable[[], GenReturn]
@@ -40,7 +39,7 @@ def _get_duckdb() -> GenReturn:
         yield con
 
 
-class _Args(NamedTuple):
+class _Args(NamedTuple):  # TODO: Change the name of this
     con_type: SQL_CONNECTIONS
     yielder: Any
     work_schema: str | None = None
@@ -134,11 +133,8 @@ def test_manual1(arg: _Args) -> None:
     assert res_pl.filter(pl.col("city") == "Phoenix").select("pct_diff").item() == 1.0, msg
     assert res_pl.filter(pl.col("city") == "Philadelphia").select("pct_diff").item() == 1.0, msg
 
-    ## Get Results:
-    ## Most of these will be no-error tests.
-    assert len(comp.results) == 1
-    res: Results = comp.results[0]
-    res.report_as_table()
+    ## Check Report Compilation:
+    comp.compile_report()  # prints reports
 
 
 if __name__ == "__main__":

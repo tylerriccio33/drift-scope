@@ -2,11 +2,10 @@
 
 Engines Supported:
 - DuckDB
+- Postgres
 
 Engines to be Supported:
-- Postgres
-- Polars
-- Pandas
+- Narwhals dispatches
 
 Install with `pip install ddrift` or (prefferebly) `uv pip install ddrift`
 
@@ -31,5 +30,5 @@ with duckdb.connect() as con:
     sql = SQLComparator(df1="table1", df2="table2", con=con)
     sql.comp_freq(vars=("city", "state"))
 
-    print(sql.results) # prints a list of result objects containing an in memory representation
+    comp.compile_report()  # prints reports to console
 ```

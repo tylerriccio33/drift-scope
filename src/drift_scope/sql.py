@@ -30,6 +30,7 @@ class SQLComparator(BaseComparator):
         con_type: SQL_CONNECTIONS,
         work_schema: str | None = None,
     ) -> None:
+        super().__init__()
         self.df1 = df1
         self.df2 = df2
         self.con = con
