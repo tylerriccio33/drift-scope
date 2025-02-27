@@ -19,6 +19,10 @@ class Results(ABC):
     """Results base class."""
 
     @abstractmethod
+    def __init__(self) -> None:
+        self.name: str
+
+    @abstractmethod
     def report_as_table(self, *, abs_pct_diff_threshold: float = 0) -> None:
         """Report findings by printing a markdown table."""
 
@@ -30,6 +34,7 @@ class FreqResults(Results, Generic[IntoFrameT]):
     vars: Collection[str]
     analysis_cols: Collection[str]
     data: IntoFrameT
+    name: str = "Categorical Frequency Results"
 
     def _filter_freq_threshold(self, abs_pct_diff_threshold: float) -> IntoFrameT:
         return (
@@ -47,7 +52,8 @@ class FreqResults(Results, Generic[IntoFrameT]):
         """
         filtered_data = self._filter_freq_threshold(abs_pct_diff_threshold)
 
-        table = Table(title="Frequency Results")
+        tab_title: str = f"Dimensions: {self.vars!s}"
+        table = Table(title=tab_title, title_justify="left")
 
         for var in self.vars:
             table.add_column(style="magenta", header=var.title(), no_wrap=True)
