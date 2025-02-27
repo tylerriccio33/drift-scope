@@ -1,6 +1,6 @@
 [project]
 name = "drift-scope"
-version = "0.0.2"
+version = "0.0.3"
 description = "Add your description here"
 readme = "README.md"
 authors = [{ name = "Tyler Riccio", email = "tylerriccio8@gmail.com" }]
