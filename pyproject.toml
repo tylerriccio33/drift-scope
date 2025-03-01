@@ -33,6 +33,16 @@ dev = [
     "testcontainers>=4.9.1",
 ]
 
+[tool.coverage.report]
+exclude_also = [
+    'def __repr__',
+    'if __name__ == .__main__.:',
+    'if TYPE_CHECKING:',
+    'class .*\bProtocol\):',
+    '@(abc\.)?abstractmethod',
+]
+
+
 [tool.mypy]
 strict = true
 disable_error_code = ['import-untyped', 'misc']
