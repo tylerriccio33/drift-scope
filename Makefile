@@ -5,7 +5,8 @@ test: ## Run pytest and calculate cov
 		--cov src \
 		--cov-report term-missing \
 		--randomly-seed 123 \
-		--doctest-modules
+		--doctest-modules \
+		--doctest-glob='*.md'
 
 .PHONY: pre-commit
 pre-commit: ## Run pre-commit hooks
