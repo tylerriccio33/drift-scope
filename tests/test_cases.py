@@ -12,7 +12,7 @@ import pytest
 from testcontainers.postgres import PostgresContainer
 
 from drift_scope._sql import SQL_CONNECTIONS, SQLConnections
-from drift_scope.dataframe import DataFrameCompare
+from drift_scope.dataframe import DataFrameComparator
 from drift_scope.results import FreqResults
 from drift_scope.sql import SQLComparator
 
@@ -50,7 +50,7 @@ class _Args:  # TODO: Change the name of this
 
 
 args: tuple[_Args, ...] = (
-    _Args(con_type="NARWHALS", comparator=DataFrameCompare),
+    _Args(con_type="NARWHALS", comparator=DataFrameComparator),
     _Args(con_type="DUCKDB", comparator=SQLComparator, yielder=_get_duckdb),
     _Args(con_type="PSYCOPG2", comparator=SQLComparator, yielder=_get_postgres),
 )
