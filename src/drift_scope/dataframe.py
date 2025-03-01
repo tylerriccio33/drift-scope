@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from drift_scope.results import Results
 
 
-class DataFrameCompare(BaseComparator):
+class DataFrameComparator(BaseComparator):
     """Compare dataframes per narwals dispatch methods."""
 
     def __init__(self, df1: IntoFrame, df2: IntoFrame) -> None:
