@@ -1,13 +1,10 @@
-`ddrift` analyzes the differences between data sources, i.e. how much has dataset a drifted from dataset b. The framework is engine agnostic. Each  engine is required to comply with simple abstract protocols in order to enable the standard reporting.
+`drift-scope` analyzes the differences between data sources, i.e. how much has dataset a drifted from dataset b. The framework is engine agnostic. Each  engine is required to comply with simple abstract protocols in order to enable the standard reporting.
 
 Engines Supported:
-- DuckDB
 - Postgres
+- Anything dispatchable to Narwhals
 
-Engines to be Supported:
-- Narwhals dispatches
-
-Install with `pip install ddrift` or (prefferebly) `uv pip install ddrift`
+Install with `uv pip install drift-scope`
 
 ## Usage
 
